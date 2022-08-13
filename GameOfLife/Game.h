@@ -20,6 +20,8 @@ private:
 	int circle_x = 0;
 	std::unique_ptr<StepTimer> _timer;
 	std::unique_ptr<DirectX::Keyboard> _keyboard;
+	std::unique_ptr<DirectX::Mouse> m_mouse;
+
 	//gol::StepTimer timer;
 	int speed = 5;
 };

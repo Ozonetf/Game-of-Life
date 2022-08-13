@@ -112,20 +112,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         //    }
         //    break;
 
-        case WM_ACTIVATEAPP:
-            DirectX::Keyboard::ProcessMessage(uMsg, wParam, lParam);
-            //if (_game)
-            //{
-            //    if (wParam)
-            //    {
-            //        //game->OnActivated();
-            //    }
-            //    else
-            //    {
-            //        //game->OnDeactivated();
-            //    }
-            //}
-            break;
+    case WM_ACTIVATEAPP:
+        OutputDebugString(L"Window Active.\n");
+        DirectX::Keyboard::ProcessMessage(uMsg, wParam, lParam);
+        DirectX::Mouse::ProcessMessage(uMsg, wParam, lParam);
+
+        //if (_game)
+        //{
+        //    if (wParam)
+        //    {
+        //        //game->OnActivated();
+        //    }
+        //    else
+        //    {
+        //        //game->OnDeactivated();
+        //    }
+        //}
+        break;
 
         //case WM_POWERBROADCAST:
         //    switch (wParam)
@@ -151,7 +154,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
 
+    case WM_MOUSEHOVER:
+        OutputDebugString(L"MouseHover.\n");
+        DirectX::Mouse::ProcessMessage(uMsg, wParam, lParam);
+        break;
+
     case WM_SYSKEYUP:
+        OutputDebugString(L"Window sysup.\n");
         DirectX::Keyboard::ProcessMessage(uMsg, wParam, lParam);
         break;
 
@@ -188,9 +197,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         break;
 
-        case WM_MOUSEACTIVATE:
-            // When you click activate the window, we want Mouse to ignore it.
-            return MA_ACTIVATEANDEAT;
+    case WM_MOUSEACTIVATE:
+        // When you click activate the window, we want Mouse to ignore it.
+        return MA_ACTIVATEANDEAT;
 
         //case WM_MENUCHAR:
         //    // A menu is active and the user presses a key that does not correspond

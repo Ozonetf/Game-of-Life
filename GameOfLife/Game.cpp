@@ -15,6 +15,9 @@ void Game::Init(HWND windowhandle, int width, int height)
 	_graphics = std::make_unique<Graphics>();
 	_timer = std::make_unique<StepTimer>();
 	_keyboard = std::make_unique<DirectX::Keyboard>();
+	m_mouse = std::make_unique<DirectX::Mouse>();
+	m_mouse->SetWindow(windowhandle);
+
 	//sets the window handle as ther rendertarget for d2d
 	if (!_graphics->init(windowhandle))
 	{
@@ -37,7 +40,7 @@ void Game::Update()
 	auto kb = _keyboard->GetState();
 	if (kb.A)
 	{
-		speed = -5;
+		speed = -speed;
 	}
 	if (circle_x>_graphics->GetWinWidth())
 	{
@@ -51,6 +54,7 @@ void Game::Update()
 	{
 		circle_x += speed;
 	}
+	auto mouse = m_mouse->GetState();
 }
 
 void Game::Render()
