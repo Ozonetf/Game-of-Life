@@ -1,0 +1,11 @@
+get keyboard mouse state(winProc message)
+-update
+input related:
+{
+add new pixel
+move camera
+adjust zoom
+}
+game of life logic
+
+-render

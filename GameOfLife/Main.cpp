@@ -114,6 +114,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     case WM_ACTIVATEAPP:
         OutputDebugString(L"Window Active.\n");
+
         DirectX::Keyboard::ProcessMessage(uMsg, wParam, lParam);
         DirectX::Mouse::ProcessMessage(uMsg, wParam, lParam);
 
@@ -154,13 +155,25 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
 
+    case WM_ACTIVATE:
+    case WM_INPUT:
+    case WM_MOUSEMOVE:
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_MOUSEWHEEL:
+    case WM_XBUTTONDOWN:
+    case WM_XBUTTONUP:
     case WM_MOUSEHOVER:
-        OutputDebugString(L"MouseHover.\n");
         DirectX::Mouse::ProcessMessage(uMsg, wParam, lParam);
         break;
 
+    case WM_KEYDOWN:
+    case WM_KEYUP:
     case WM_SYSKEYUP:
-        OutputDebugString(L"Window sysup.\n");
         DirectX::Keyboard::ProcessMessage(uMsg, wParam, lParam);
         break;
 

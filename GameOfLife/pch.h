@@ -13,6 +13,8 @@
 #include <math.h>
 #include <iostream>
 
+#include <sstream>
+
 // Windows Header Files:
 #include <windows.h>
 #include <wincodec.h>

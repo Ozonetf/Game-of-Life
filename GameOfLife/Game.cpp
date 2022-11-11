@@ -37,10 +37,15 @@ void Game::Tick()
 
 void Game::Update()
 {
+	using namespace DirectX::SimpleMath;
 	auto kb = _keyboard->GetState();
 	if (kb.A)
 	{
 		speed = -speed;
+	}
+	if (kb.Escape)
+	{
+		activePixels.clear();
 	}
 	if (circle_x>_graphics->GetWinWidth())
 	{
@@ -55,6 +60,15 @@ void Game::Update()
 		circle_x += speed;
 	}
 	auto mouse = m_mouse->GetState();
+	if (mouse.leftButton)
+	{
+		activePixels.push_back(Vector2(mouse.x, mouse.y));
+		std::wostringstream ws;
+		ws << mouse.x << ", "<< mouse.y << '\n';
+		const std::wstring s(ws.str());
+		LPCWSTR wideString = s.c_str();
+		OutputDebugString(wideString);
+	}
 }
 
 void Game::Render()
@@ -65,6 +79,11 @@ void Game::Render()
 	//{
 	//	_graphics->DrawCircle(rand() % 800, rand() % 600, rand() % 300, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f);
 	//}
+	for (size_t i = 0; i < activePixels.size(); i++)
+	{
+		_graphics->FillRect(activePixels[i]);
+
+	}
 	_graphics->DrawCircle(circle_x, _graphics->GetWinHeight()/2, 30, 1, 1, 1, 1);
 	_graphics->EndDraw();
 }

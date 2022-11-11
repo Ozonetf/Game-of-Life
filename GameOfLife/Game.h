@@ -3,6 +3,7 @@
 class Game 
 {
 	std::unique_ptr<Graphics>	_graphics;
+	std::vector<DirectX::SimpleMath::Vector2>	activePixels;
 public:
 	Game();
 	~Game();
