@@ -23,6 +23,8 @@ void Game::Init(HWND windowhandle, int width, int height)
 	{
 		throw 20;
 	};
+	_cameraCoord.x = width / 2;
+	_cameraCoord.y = height / 2;
 	circle_x = 0;
 }
 
@@ -32,21 +34,14 @@ void Game::Tick()
 	{
 		Update();
 	});
+	//PRINT_DEBUG("frame time: %d\n", _timer->GetFramesPerSecond());
 	Render();
 }
 
 void Game::Update()
 {
 	using namespace DirectX::SimpleMath;
-	auto kb = _keyboard->GetState();
-	if (kb.A)
-	{
-		speed = -speed;
-	}
-	if (kb.Escape)
-	{
-		activePixels.clear();
-	}
+	ProcessInputs();
 	if (circle_x>_graphics->GetWinWidth())
 	{
 		circle_x = 0;
@@ -59,15 +54,25 @@ void Game::Update()
 	{
 		circle_x += speed;
 	}
-	auto mouse = m_mouse->GetState();
-	if (mouse.leftButton)
+	int left, right, top, bottom;
+	int height = _graphics->GetWinHeight();
+	int width = _graphics->GetWinWidth();
+	left = _cameraCoord.x - (width / 2);
+	right = _cameraCoord.x + (width / 2);
+	top = _cameraCoord.y - (height / 2);
+	bottom = _cameraCoord.y + (height / 2);
+	for (size_t i = 0; i < activePixels.size(); i++)
 	{
-		activePixels.push_back(Vector2(mouse.x, mouse.y));
-		std::wostringstream ws;
-		ws << mouse.x << ", "<< mouse.y << '\n';
-		const std::wstring s(ws.str());
-		LPCWSTR wideString = s.c_str();
-		OutputDebugString(wideString);
+		if (activePixels[i].x >left && activePixels[i].x<right)
+		{
+			if (activePixels[i].y >top && activePixels[i].y<bottom)
+			{
+				DirectX::SimpleMath::Vector2 absV;
+				absV.x = activePixels[i].x - (left);
+				absV.y = activePixels[i].y - (top);
+				_renderQueue.push(absV);
+			}
+		}
 	}
 }
 
@@ -75,22 +80,75 @@ void Game::Render()
 {
 	_graphics->BeginDraw();
 	_graphics->ClearScreen(0.0f, 0.0f, 0.0f);
-	//for (size_t i = 0; i < 1000; i++)
-	//{
-	//	_graphics->DrawCircle(rand() % 800, rand() % 600, rand() % 300, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f);
-	//}
-	for (size_t i = 0; i < activePixels.size(); i++)
+	while (!_renderQueue.empty())
 	{
-		_graphics->FillRect(activePixels[i]);
-
+		_graphics->FillRect(_renderQueue.front());
+		_renderQueue.pop();
 	}
+	//for (size_t i = 0; i < activePixels.size(); i++)
+	//{
+	//	_graphics->FillRect(activePixels[i]);
+
+	//}
 	_graphics->DrawCircle(circle_x, _graphics->GetWinHeight()/2, 30, 1, 1, 1, 1);
 	_graphics->EndDraw();
+}
+
+void Game::ProcessInputs()
+{
+	using namespace DirectX::SimpleMath;
+	auto kb = _keyboard->GetState();
+	if (kb.A)
+	{
+		speed = -speed;
+	}
+	if (kb.B)
+	{
+		std::srand(time(NULL));
+		activePixels.clear();
+		for (size_t i = 0; i < 50000; i++)
+		{
+			activePixels.push_back(Vector2(std::rand() % _graphics->GetWinWidth(), std::rand() % _graphics->GetWinHeight()));
+		}
+	}
+	if (kb.C)
+	{
+		activePixels.clear();
+	}
+	if (kb.Right)
+	{
+		_cameraCoord.x += 10;
+	}
+	if (kb.Left)
+	{
+		_cameraCoord.x -= 10;
+	}
+	if (kb.Up)
+	{
+		_cameraCoord.y -= 10;
+	}
+	if (kb.Down)
+	{
+		_cameraCoord.y += 10;
+	}	
+	auto mouse = m_mouse->GetState();
+	if (mouse.leftButton)
+	{
+		activePixels.push_back(Vector2(mouse.x, mouse.y));
+		std::wostringstream ws;
+		ws << mouse.x << ", " << mouse.y << '\n';
+		const std::wstring s(ws.str());
+		LPCWSTR wideString = s.c_str();
+		OutputDebugString(wideString);
+	}
 }
 
 void Game::OnWindowSizeChanged(long width, long height)
 {
 	_graphics->Resize(width, height);
+	//keep camera centered when resizing window
+	_cameraCoord.x = width / 2;
+	_cameraCoord.y = height / 2;
 }
 
 void Game::OnResize()

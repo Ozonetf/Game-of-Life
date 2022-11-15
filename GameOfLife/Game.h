@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics.h"
+#include "Main.h"
 class Game 
 {
 	std::unique_ptr<Graphics>	_graphics;
@@ -17,12 +18,15 @@ public:
 	void OnResize();
 private:
 	void Update();
+	void ProcessInputs();
 
 	int circle_x = 0;
 	std::unique_ptr<StepTimer> _timer;
 	std::unique_ptr<DirectX::Keyboard> _keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 
-	//gol::StepTimer timer;
+	std::queue<DirectX::SimpleMath::Vector2> _renderQueue;
+	int _zoom = 1;
+	DirectX::SimpleMath::Vector2 _cameraCoord = DirectX::SimpleMath::Vector2(0, 0);
 	int speed = 5;
 };

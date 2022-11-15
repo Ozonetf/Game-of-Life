@@ -11,6 +11,8 @@ inline void SafeRelease(Interface** ppInterfaceToRelease)
         (*ppInterfaceToRelease) = NULL;
     }
 }
+//print debug macro similar to printf function
+#define PRINT_DEBUG(...) {char cad[512]; sprintf_s(cad, 512, __VA_ARGS__);  wchar_t* wString = new wchar_t[512]; MultiByteToWideChar(CP_ACP, 0, cad, -1, wString, 512); OutputDebugString(wString);}
 
 
 #ifndef Assert

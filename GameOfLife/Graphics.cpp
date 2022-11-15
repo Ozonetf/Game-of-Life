@@ -11,7 +11,7 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
-	if (_factory) SafeRelease(&_factory);;
+	if (_factory) SafeRelease(&_factory);
 	if (_renderTarget) SafeRelease(&_renderTarget);
 	if (_brush) SafeRelease(&_brush); 
 }
