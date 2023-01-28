@@ -82,7 +82,7 @@ void Game::Render()
 	_graphics->ClearScreen(0.0f, 0.0f, 0.0f);
 	while (!_renderQueue.empty())
 	{
-		_graphics->FillRect(_renderQueue.front());
+		_graphics->FillRect(_renderQueue.front(), _zoom);
 		_renderQueue.pop();
 	}
 	//for (size_t i = 0; i < activePixels.size(); i++)
@@ -96,6 +96,7 @@ void Game::Render()
 
 void Game::ProcessInputs()
 {
+	using ButtonState = DirectX::Mouse::ButtonStateTracker::ButtonState;
 	using namespace DirectX::SimpleMath;
 	auto kb = _keyboard->GetState();
 	if (kb.A)
@@ -132,15 +133,38 @@ void Game::ProcessInputs()
 		_cameraCoord.y += 10;
 	}	
 	auto mouse = m_mouse->GetState();
+	_traker.Update(mouse);
+	if (_traker.middleButton == ButtonState::PRESSED)
+	{
+		m_mouse->SetMode(DirectX::Mouse::MODE_RELATIVE);
+	}
+	else if (_traker.middleButton == ButtonState::RELEASED)
+	{
+		m_mouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+	}
+	else if (_traker.middleButton == ButtonState::HELD)
+	{
+		if (mouse.positionMode == DirectX::Mouse::MODE_RELATIVE)
+		{
+			_cameraCoord.x -= mouse.x;
+			_cameraCoord.y -= mouse.y;
+		}
+
+	}
 	if (mouse.leftButton)
 	{
-		activePixels.push_back(Vector2(mouse.x, mouse.y));
-		std::wostringstream ws;
-		ws << mouse.x << ", " << mouse.y << '\n';
-		const std::wstring s(ws.str());
-		LPCWSTR wideString = s.c_str();
-		OutputDebugString(wideString);
+		int left, top;
+		int height = _graphics->GetWinHeight();
+		int width = _graphics->GetWinWidth();
+		left = _cameraCoord.x - (width / 2);
+		top = _cameraCoord.y - (height / 2);
+		activePixels.push_back(Vector2(mouse.x + left, mouse.y + top));
+		//PRINT_DEBUG("mouse x: %d, y: %d\n", mouse.x, mouse.y);
 	}
+	//one "click" on MWheel typically 120 in value
+	_zoom = mouse.scrollWheelValue / 120;
+	if (_zoom < 0) _zoom = 0;
+
 }
 
 void Game::OnWindowSizeChanged(long width, long height)

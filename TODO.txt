@@ -2,10 +2,18 @@ get keyboard mouse state(winProc message)
 -update
 input related:
 {
-add new pixel
-move camera
-adjust zoom
+add new pixel	-done
+move camera	-done
+adjust zoom	
 }
 game of life logic
 
+-if active cell has 2-3 neighbour cell, it lives
+-if inactive has exactly 3, become life
+-all other cell dies next tick
+TODO:
+data structure containing active cells
+
+
 -render
+optimization using drawrecengles?(draws array of rects at once, reduce draw call)

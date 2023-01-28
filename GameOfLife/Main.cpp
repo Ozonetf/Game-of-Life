@@ -229,8 +229,8 @@ HRESULT Initialize()
     OutputDebugString(L"This will go to the output.\n");
 	HRESULT res ;
 	LPCWSTR CLASS_NAME = L"MainWindow";
-	LPCWSTR WINDOW_NAME = L"Game of Life";
-	
+    LPCWSTR WINDOW_NAME = L"Game of Life";
+
 	WNDCLASSEX windowclass;
 	ZeroMemory(&windowclass, sizeof(WNDCLASSEX));
 	windowclass.cbSize = sizeof(WNDCLASSEX);
@@ -245,11 +245,10 @@ HRESULT Initialize()
 	//rectangle size for the window client without border
 	RECT rect = { 0, 0, 800, 600 };
 	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, false, WS_EX_OVERLAPPEDWINDOW);
-
     HWND windowHandle = CreateWindowEx(
 		WS_EX_OVERLAPPEDWINDOW,
 		CLASS_NAME,				//window class name
-		WINDOW_NAME,			//window name
+        WINDOW_NAME,			//window name
 		WS_OVERLAPPEDWINDOW,	//style	
 		100,					//x coord
 		100,					//y coord

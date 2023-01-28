@@ -22,13 +22,18 @@ bool Graphics::init(HWND windowhandle)
 	if (res != S_OK) return false;	//if factory didnt create succesfully
 	RECT rect;
 	GetClientRect(windowhandle, &rect);
+
+	D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties();
+	//ignore the alpha chennel since we're not interested, slight optimization
+	props.pixelFormat.alphaMode = D2D1_ALPHA_MODE_IGNORE;	
 	res = _factory->CreateHwndRenderTarget(
-		D2D1::RenderTargetProperties(),
+		props,
 		D2D1::HwndRenderTargetProperties(windowhandle, D2D1::SizeU(rect.right, rect.bottom)), 
 		&_renderTarget
 		);
 	if (res != S_OK) return false;
 
+	D2D1_ALPHA_MODE::D2D1_ALPHA_MODE_IGNORE;
 	res = _renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0), &_brush);
 	if (res != S_OK) return false;
 	return true;
@@ -53,13 +58,13 @@ void Graphics::DrawCircle(float x, float y, float radius, float r, float g, floa
 	_renderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), radius, radius), _brush, 3.0f);
 }
 
-void Graphics::FillRect(DirectX::SimpleMath::Vector2 V)
+void Graphics::FillRect(DirectX::SimpleMath::Vector2 V, int zoom)
 {
 	D2D1_RECT_F r;
 	r.top = V.y;
 	r.left = V.x;
-	r.bottom = V.y+1;
-	r.right = V.x+1;
+	r.bottom = V.y+1+zoom;
+	r.right = V.x+1+zoom;
 	_renderTarget->FillRectangle(r, _brush);
 }
 
