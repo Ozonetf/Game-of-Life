@@ -58,13 +58,13 @@ void Graphics::DrawCircle(float x, float y, float radius, float r, float g, floa
 	_renderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), radius, radius), _brush, 3.0f);
 }
 
-void Graphics::FillRect(DirectX::SimpleMath::Vector2 V, int zoom)
+void Graphics::FillRect(DirectX::SimpleMath::Vector2 V, float zoom)
 {
 	D2D1_RECT_F r;
-	r.top = V.y;
-	r.left = V.x;
-	r.bottom = V.y+1+zoom;
-	r.right = V.x+1+zoom;
+	r.top = V.y ;
+	r.left = V.x ;
+	r.bottom = r.top + zoom;
+	r.right = r.left + zoom;
 	_renderTarget->FillRectangle(r, _brush);
 }
 

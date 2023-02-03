@@ -24,11 +24,17 @@ private:
 	std::unique_ptr<StepTimer> _timer;
 	std::unique_ptr<DirectX::Keyboard> _keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
-	DirectX::Mouse::ButtonStateTracker _traker;
+	DirectX::Mouse::ButtonStateTracker _mTraker;
+	DirectX::Keyboard::KeyboardStateTracker _kTraker;
 
 
 	std::queue<DirectX::SimpleMath::Vector2> _renderQueue;
-	int _zoom = 0;
+	int _zoom = 1;
+	int _scrollTemp = 0;
+	int _zoomFactor = 120;
+	int _zoomRatioX = 0;
+	int _zoomRatioY = 0;
+	float _pixelScale = 0;
 	DirectX::SimpleMath::Vector2 _cameraCoord = DirectX::SimpleMath::Vector2(0, 0);
 	int speed = 5;
 };

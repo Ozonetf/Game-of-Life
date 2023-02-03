@@ -16,7 +16,8 @@ public:
 	void SetWindow(HWND windowhandle, long width, long height);
 	void ClearScreen(float r, float g, float b);
 	void DrawCircle(float x, float y, float radius, float r, float g, float b, float a);
-	void FillRect(DirectX::SimpleMath::Vector2 V, int zoom);
+	//draws an pixel with proper scale using a zoom factor 
+	void FillRect(DirectX::SimpleMath::Vector2 V, float zoom);
 	void Resize(long width, long height);
 
 	RECT GetWinRect() { return _windowRect; };

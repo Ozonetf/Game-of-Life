@@ -24,7 +24,9 @@ void Game::Init(HWND windowhandle, int width, int height)
 		throw 20;
 	};
 	_cameraCoord.x = width / 2;
-	_cameraCoord.y = height / 2;
+	_cameraCoord.y = height / 2;	
+	_zoomRatioX = width / 48;
+	_zoomRatioY = height / 48;
 	circle_x = 0;
 }
 
@@ -54,22 +56,33 @@ void Game::Update()
 	{
 		circle_x += speed;
 	}
+	//figures out which pixels are in camera's view, get their relative postion and push to render queue
+	//cam coord is center of the screen
 	int left, right, top, bottom;
 	int height = _graphics->GetWinHeight();
 	int width = _graphics->GetWinWidth();
-	left = _cameraCoord.x - (width / 2);
-	right = _cameraCoord.x + (width / 2);
-	top = _cameraCoord.y - (height / 2);
-	bottom = _cameraCoord.y + (height / 2);
+	left = _cameraCoord.x - (width / 2) + ((_zoom - 1) * _zoomRatioX);
+	right = _cameraCoord.x + (width / 2) - ((_zoom - 1) * _zoomRatioX);
+	top = _cameraCoord.y - (height / 2) + ((_zoom - 1) * _zoomRatioY);
+	bottom = _cameraCoord.y + (height / 2) - ((_zoom - 1) * _zoomRatioY);
+	float xx, yy;
+	xx = float(width) / (right - left);
+	yy = float(height) / (bottom - top);
+
+	_pixelScale = float(width) / float(right - left);
+	PRINT_DEBUG("scale: %f\n", _pixelScale);
 	for (size_t i = 0; i < activePixels.size(); i++)
 	{
-		if (activePixels[i].x >left && activePixels[i].x<right)
+		if (activePixels[i].x > left && 
+			activePixels[i].x <	right)
 		{
-			if (activePixels[i].y >top && activePixels[i].y<bottom)
+			if (activePixels[i].y >= top && 
+				activePixels[i].y <	bottom)
 			{
 				DirectX::SimpleMath::Vector2 absV;
-				absV.x = activePixels[i].x - (left);
-				absV.y = activePixels[i].y - (top);
+
+				absV.x = (activePixels[i].x - left) * xx;
+				absV.y = (activePixels[i].y - top) * xx;
 				_renderQueue.push(absV);
 			}
 		}
@@ -82,13 +95,12 @@ void Game::Render()
 	_graphics->ClearScreen(0.0f, 0.0f, 0.0f);
 	while (!_renderQueue.empty())
 	{
-		_graphics->FillRect(_renderQueue.front(), _zoom);
+		_graphics->FillRect(_renderQueue.front(), _pixelScale);
 		_renderQueue.pop();
 	}
 	//for (size_t i = 0; i < activePixels.size(); i++)
 	//{
 	//	_graphics->FillRect(activePixels[i]);
-
 	//}
 	_graphics->DrawCircle(circle_x, _graphics->GetWinHeight()/2, 30, 1, 1, 1, 1);
 	_graphics->EndDraw();
@@ -98,11 +110,10 @@ void Game::ProcessInputs()
 {
 	using ButtonState = DirectX::Mouse::ButtonStateTracker::ButtonState;
 	using namespace DirectX::SimpleMath;
+	//KEYBOARD
 	auto kb = _keyboard->GetState();
-	if (kb.A)
-	{
-		speed = -speed;
-	}
+	_kTraker.Update(kb);
+	if (_kTraker.pressed.A) speed = -speed;
 	if (kb.B)
 	{
 		std::srand(time(NULL));
@@ -132,17 +143,22 @@ void Game::ProcessInputs()
 	{
 		_cameraCoord.y += 10;
 	}	
+	if (_kTraker.pressed.LeftControl) _zoomFactor = 30; 
+	//one "scroll" on MWheel typically 120 in value
+	if (_kTraker.released.LeftControl) _zoomFactor = 120;
+
+	//MOUSE
 	auto mouse = m_mouse->GetState();
-	_traker.Update(mouse);
-	if (_traker.middleButton == ButtonState::PRESSED)
+	_mTraker.Update(mouse);
+	if (_mTraker.rightButton == ButtonState::PRESSED)
 	{
 		m_mouse->SetMode(DirectX::Mouse::MODE_RELATIVE);
 	}
-	else if (_traker.middleButton == ButtonState::RELEASED)
+	else if (_mTraker.rightButton == ButtonState::RELEASED)
 	{
 		m_mouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 	}
-	else if (_traker.middleButton == ButtonState::HELD)
+	else if (_mTraker.rightButton == ButtonState::HELD)
 	{
 		if (mouse.positionMode == DirectX::Mouse::MODE_RELATIVE)
 		{
@@ -153,26 +169,35 @@ void Game::ProcessInputs()
 	}
 	if (mouse.leftButton)
 	{
-		int left, top;
+		int left, right, top;
 		int height = _graphics->GetWinHeight();
 		int width = _graphics->GetWinWidth();
-		left = _cameraCoord.x - (width / 2);
+		left = _cameraCoord.x - (width / 2) + ((_zoom - 1) * _zoomRatioX);
+		right = _cameraCoord.x + (width / 2) - ((_zoom - 1) * _zoomRatioX);
 		top = _cameraCoord.y - (height / 2);
-		activePixels.push_back(Vector2(mouse.x + left, mouse.y + top));
-		//PRINT_DEBUG("mouse x: %d, y: %d\n", mouse.x, mouse.y);
+		_pixelScale = float(width) / float(right - left);
+		int x = left + (mouse.x-left) / int(_pixelScale);
+		int y = top + (mouse.y-top) / int(_pixelScale);
+		activePixels.push_back(Vector2(x, y));
+		PRINT_DEBUG("mouse x: %d, y: %d		x: %d y: %d\n", mouse.x, mouse.y, x, y);
+		//PRINT_DEBUG("added x: %d, y: %d\n", mouse.x + left, mouse.y + top);
 	}
-	//one "click" on MWheel typically 120 in value
-	_zoom = mouse.scrollWheelValue / 120;
-	if (_zoom < 0) _zoom = 0;
-
+	_zoom -= (_scrollTemp - mouse.scrollWheelValue) / _zoomFactor;
+	_scrollTemp = mouse.scrollWheelValue;
+	if (_zoom < 1) _zoom = 1;
+	//PRINT_DEBUG("zoom: %d\n", _zoom);
 }
 
 void Game::OnWindowSizeChanged(long width, long height)
 {
+	PRINT_DEBUG("this resized");
 	_graphics->Resize(width, height);
 	//keep camera centered when resizing window
 	_cameraCoord.x = width / 2;
 	_cameraCoord.y = height / 2;
+	_zoomRatioX = width / 48;
+	_zoomRatioY = height / 48;
+	PRINT_DEBUG("x ratio: %d, y ratio: %d\n", _zoomRatioX, _zoomRatioY);
 }
 
 void Game::OnResize()

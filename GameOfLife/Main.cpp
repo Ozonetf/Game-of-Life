@@ -203,7 +203,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
                 SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-                ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+                ShowWindow(hwnd, SW_SHOWMAXIMIZED);       
+                //BUG when enter full screen the winsize dont get properly updated causing problem in 
+                //render queue cullings
+                RECT rc;
+                GetClientRect(hwnd, &rc);
+                _game->OnWindowSizeChanged(rc.right - rc.left, rc.bottom - rc.top);
             }
 
             s_fullscreen = !s_fullscreen;
