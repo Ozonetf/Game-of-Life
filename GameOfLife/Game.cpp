@@ -70,7 +70,6 @@ void Game::Update()
 	yy = float(height) / (bottom - top);
 
 	_pixelScale = float(width) / float(right - left);
-	PRINT_DEBUG("scale: %f\n", _pixelScale);
 	for (size_t i = 0; i < activePixels.size(); i++)
 	{
 		if (activePixels[i].x > left && 
@@ -174,12 +173,12 @@ void Game::ProcessInputs()
 		int width = _graphics->GetWinWidth();
 		left = _cameraCoord.x - (width / 2) + ((_zoom - 1) * _zoomRatioX);
 		right = _cameraCoord.x + (width / 2) - ((_zoom - 1) * _zoomRatioX);
-		top = _cameraCoord.y - (height / 2);
+		top = _cameraCoord.y - (height / 2) + ((_zoom - 1) * _zoomRatioY);
 		_pixelScale = float(width) / float(right - left);
-		int x = left + (mouse.x-left) / int(_pixelScale);
-		int y = top + (mouse.y-top) / int(_pixelScale);
-		activePixels.push_back(Vector2(x, y));
-		PRINT_DEBUG("mouse x: %d, y: %d		x: %d y: %d\n", mouse.x, mouse.y, x, y);
+		float x = left + (mouse.x) / _pixelScale;
+		float y = top + (mouse.y) / _pixelScale;
+		activePixels.push_back(Vector2(int(x), int(y)));
+		PRINT_DEBUG("mouse x: %d, y: %d		x: %f y: %f\n", mouse.x, mouse.y, x, y);
 		//PRINT_DEBUG("added x: %d, y: %d\n", mouse.x + left, mouse.y + top);
 	}
 	_zoom -= (_scrollTemp - mouse.scrollWheelValue) / _zoomFactor;
