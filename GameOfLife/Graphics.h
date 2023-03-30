@@ -23,6 +23,8 @@ public:
 	RECT GetWinRect() { return _windowRect; };
 	long GetWinHeight() { return _windowRect.bottom; }
 	long GetWinWidth() { return _windowRect.right; }
+
+
 private:
 	void CreateWinSizeDepedentResources();
 	HWND _windowHandle;

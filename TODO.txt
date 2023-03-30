@@ -3,8 +3,8 @@ get keyboard mouse state(winProc message)
 input related:
 {
 add new pixel	-done
-move camera	-done
-adjust zoom	
+move camera		-done
+adjust zoom		-done
 }
 game of life logic
 

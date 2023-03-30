@@ -29,6 +29,7 @@ private:
 
 
 	std::queue<DirectX::SimpleMath::Vector2> _renderQueue;
+	bool paused = true;
 	int _zoom = 1;
 	int _scrollTemp = 0;
 	int _zoomFactor = 120;

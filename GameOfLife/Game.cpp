@@ -177,14 +177,12 @@ void Game::ProcessInputs()
 		_pixelScale = float(width) / float(right - left);
 		float x = left + (mouse.x) / _pixelScale;
 		float y = top + (mouse.y) / _pixelScale;
-		activePixels.push_back(Vector2(int(x), int(y)));
+		activePixels.push_back(DirectX::SimpleMath::Vector2(int(x), int(y)));
 		PRINT_DEBUG("mouse x: %d, y: %d		x: %f y: %f\n", mouse.x, mouse.y, x, y);
-		//PRINT_DEBUG("added x: %d, y: %d\n", mouse.x + left, mouse.y + top);
 	}
 	_zoom -= (_scrollTemp - mouse.scrollWheelValue) / _zoomFactor;
 	_scrollTemp = mouse.scrollWheelValue;
 	if (_zoom < 1) _zoom = 1;
-	//PRINT_DEBUG("zoom: %d\n", _zoom);
 }
 
 void Game::OnWindowSizeChanged(long width, long height)
