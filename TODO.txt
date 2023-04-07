@@ -1,4 +1,4 @@
-get keyboard mouse state(winProc message)
+ get keyboard mouse state(winProc message)
 -update
 input related:
 {

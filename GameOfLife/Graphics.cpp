@@ -63,8 +63,8 @@ void Graphics::FillRect(DirectX::SimpleMath::Vector2 V, float zoom)
 	D2D1_RECT_F r;
 	r.top = V.y ;
 	r.left = V.x ;
-	r.bottom = r.top + zoom + 1;
-	r.right = r.left + zoom + 1;
+	r.bottom = r.top + zoom ;
+	r.right = r.left + zoom ;
 	_renderTarget->FillRectangle(r, _brush);
 }
 

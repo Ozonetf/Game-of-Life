@@ -255,8 +255,8 @@ HRESULT Initialize()
 		CLASS_NAME,				//window class name
         WINDOW_NAME,			//window name
 		WS_OVERLAPPEDWINDOW,	//style	
-		100,					//x coord
-		100,					//y coord
+		0,					//x coord
+		0,					//y coord
 		rect.right - rect.left,	//window width
 		rect.bottom - rect.top,	//window height
 		NULL,					//window parent
